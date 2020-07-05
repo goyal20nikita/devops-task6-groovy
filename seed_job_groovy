@@ -1,16 +1,16 @@
 job("devops_task6_job1"){
-                           description("Pull  the Github repo automatically when some developers push repo to Github.")
-                           scm{
-                                 github("goyal20nikita/devops-task6-groovy","master")
-                              }
+         description("Pull  the Github repo automatically when some developers push repo to Github.")
+         scm{
+               github("goyal20nikita/devops-task6-groovy","master")
+            }
 
-                           triggers {
-                                       scm("* * * * *")
-                                       upstream('devops_task6_seed_job', 'SUCCESS')
-                                    }
-                           steps{
-                                   shell(readFileFromWorkspace('devops_task6_job1_code.sh'))
-                                }                          
+         triggers {
+                    scm("* * * * *")
+                    upstream('devops_task6_seed_job', 'SUCCESS')
+                  }
+         steps{
+               shell(readFileFromWorkspace('devops_task6_job1_code.sh'))
+              }                          
 
                         }
 job("devops_task6_job2"){
