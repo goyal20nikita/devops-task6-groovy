@@ -1,0 +1,80 @@
+job("devops_task6_job1"){
+                           description("Pull  the Github repo automatically when some developers push repo to Github.")
+                           scm{
+                                 github("goyal20nikita/devops-task6-groovy","master")
+                              }
+
+                           triggers {
+                                       scm("* * * * *")
+                                       upstream('devops_task6_seed_job', 'SUCCESS')
+                                    }
+                           steps{
+                                   shell(readFileFromWorkspace('devops_task6_job1_code.sh'))
+                                }                          
+
+                        }
+job("devops_task6_job2"){
+           description("""1.Jenkins should automatically start the respective language interpreter 
+                        2.Expose your pod so that testing team could perform the testing on the pod
+                        3.Make the data to remain persistent using PVC""")
+           
+           triggers {
+                       upstream('devops_task6_job1', 'SUCCESS')
+                    }
+           steps{
+                 shell(readFileFromWorkspace('devops_task6_job2_code.sh'))
+             }                          
+
+             }
+job("devops_task6_job3"){
+           description("Test your app if it  is working or not.")
+           
+
+           triggers {
+                      upstream('devops_task6_job2', 'SUCCESS')
+                    }
+           steps{
+                 shell(readFileFromWorkspace('devops_task6_job3_code.sh'))
+             }                          
+
+             }
+job("devops_task6_job4"){
+          
+            triggers {
+                      
+                      upstream('devops_task6_job3', 'SUCCESS')
+                     }
+            publishers {
+        extendedEmail {
+            recipientList('nikita211211211@gmail.com')
+            defaultSubject('webpage is not working properly')
+            defaultContent("""Goodmorning
+                            hloo developer
+                            kindly check your code it is not working properly""")
+            contentType('text/plain')
+            triggers {
+                beforeBuild()
+                stillUnstable {
+                    subject('Subject')
+                    content('Body')
+                    sendTo {
+                        developers()
+                        requester()
+                        culprits()
+                    }
+                }
+            }
+        }
+    }
+  }
+
+buildPipelineView('project-A') {
+    filterBuildQueue()
+    filterExecutors()
+    title('DevopsTask6')
+    displayedBuilds(1)
+    selectedJob('devops_task6_seed_job')
+    alwaysAllowManualTrigger()
+    showPipelineParameters()
+    refreshFrequency(60)
+}
